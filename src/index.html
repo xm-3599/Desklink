@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f5f7f3">
+  <link rel="icon" href="/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/ui.css">
+  <title>同桌 · 局域网远程桌面</title>
+  <script src="/video.js" defer></script>
+  <script src="/ui.js" defer></script>
+</head>
+<body>
+  <header class="topbar" id="topbar">
+    <div class="brand"><span class="brandmark" aria-hidden="true"></span>同桌<span class="brand-en">Desklink</span></div>
+    <span class="network"><i data-icon="link"></i>局域网直连</span>
+  </header>
+  <main id="home">
+    <section id="pair" class="pair-layout">
+      <div class="illustration" aria-hidden="true">
+        <div class="dot-grid"></div><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="hardware"><div class="monitor"><div class="wallpaper"></div></div><div class="stand"></div><div class="foot"></div>
+          <div class="tablet"><div class="wallpaper tablet-wall"></div></div></div>
+      </div>
+      <div class="pair-copy">
+        <div class="section-label"><span class="short-line"></span>设备配对</div>
+        <h1>连接你的电脑</h1>
+        <p class="muted">输入电脑端显示的 8 位配对码，<br class="wide">即可在这台平板上打开桌面。</p>
+        <form id="pair-form"><label for="pin">一次性配对码</label>
+          <input id="pin" type="text" inputmode="numeric" pattern="[0-9 ]{8,9}" maxlength="9" placeholder="0000 0000" autocomplete="one-time-code" required>
+          <p role="alert" id="pair-error" class="error" hidden></p>
+          <button class="primary block" id="pair-submit">配对电脑<i data-icon="arrow"></i></button>
+        </form>
+      </div>
+    </section>
+    <section id="devices" hidden>
+      <div class="section-label"><span class="short-line"></span>设备管理</div>
+      <div class="heading-row"><h1>我的设备</h1><button class="quiet" id="unpair"><i data-icon="unlink"></i>断开配对</button></div>
+      <div class="list-title"><span class="status-dot"></span>在线设备 <b id="online-count">1</b></div>
+      <button id="device-card" class="device-card">
+        <span class="device-thumb"><i data-icon="monitor"></i></span>
+        <span class="device-info"><strong class="pc-name"></strong><small>Windows 电脑 · 主显示器</small></span>
+        <span class="tag online">在线</span><i data-icon="next"></i>
+      </button>
+    </section>
+    <section id="detail" hidden>
+      <button id="back-list" class="back"><i data-icon="prev"></i>我的设备</button>
+      <div class="detail-head"><h1 class="pc-name"></h1><span class="tag online">在线</span></div>
+      <div class="device-view"><div class="preview"><img id="preview-img" alt="电脑桌面预览" hidden><span id="preview-note">正在获取桌面预览…</span></div>
+        <div class="action-row"><div class="display-info"><i data-icon="monitor"></i><span>主显示器<small id="resolution"></small></span></div>
+          <div class="actions"><button id="watch" class="secondary"><i data-icon="eye"></i>仅观看</button>
+          <button id="enter" class="primary">进入桌面<i data-icon="arrow"></i></button></div></div>
+      </div>
+    </section>
+  </main>
+  <section id="session" hidden aria-label="远程桌面">
+    <div id="stage"><img id="screen" alt="远程电脑桌面" draggable="false"><canvas id="video-screen" aria-label="远程电脑视频" hidden></canvas><span id="screen-state">正在连接桌面…</span></div>
+    <div class="rail">
+      <button id="tools" aria-expanded="false"><i data-icon="settings"></i><span>操作</span></button>
+      <button id="keyboard"><i data-icon="keyboard"></i><span>键盘</span></button>
+      <button id="full"><i data-icon="expand"></i><span>全屏</span></button>
+      <button id="exit"><i data-icon="exit"></i><span>退出</span></button>
+    </div>
+    <aside id="drawer" hidden>
+      <div class="panel-title"><h2>操作面板</h2><button class="icon-btn" id="close-tools" aria-label="收起操作面板"><i data-icon="close"></i></button></div>
+      <div class="meter"><span class="status-dot"></span><span id="meter">正在测量帧率…</span></div>
+      <fieldset><legend>会话模式</legend><div class="segmented" id="modes"><button data-value="view">仅观看</button><button data-value="control">可控制</button></div></fieldset>
+      <fieldset><legend>指针操作</legend><div class="segmented" id="gestures"><button data-value="direct">直接触控</button><button data-value="pad">触控板</button></div><p id="gesture-hint"></p></fieldset>
+      <fieldset><legend>画质</legend><div class="segmented" id="quality"><button data-value="light">流畅</button><button data-value="balanced">均衡</button><button data-value="sharp">清晰</button></div><p id="quality-hint"></p></fieldset>
+      <fieldset><legend>传输方式</legend><div class="segmented" id="transport"><button data-value="auto">自动 · 优先 H.264</button><button data-value="jpeg">兼容 JPEG</button></div><p id="transport-note"></p></fieldset>
+      <fieldset><legend>目标帧率</legend><div class="segmented" id="fps"><button data-value="5">5</button><button data-value="10">10</button><button data-value="15">15</button><button data-value="30">30</button><button data-value="60">60</button></div></fieldset>
+      <fieldset><legend>快捷操作</legend><div class="shortcuts"><button data-key="desktop"><i data-icon="monitor"></i>显示桌面</button><button data-key="switch"><i data-icon="layers"></i>切换窗口</button></div></fieldset>
+    </aside>
+    <div id="keysheet" hidden>
+      <div class="panel-title"><h2>键盘输入</h2><button class="icon-btn" id="close-keys" aria-label="收起键盘"><i data-icon="close"></i></button></div>
+      <textarea id="text-input" maxlength="1200" rows="2" placeholder="点选电脑上的输入框，再在这里输入文字" aria-label="要发送到电脑的文字"></textarea>
+      <div class="key-chips"><button data-key="enter">Enter</button><button data-key="back">退格</button><button data-key="tab">Tab</button><button data-key="esc">Esc</button><button data-key="all">全选</button><button data-key="copy">复制</button><button data-key="paste">粘贴</button><button data-key="undo">撤销</button></div>
+      <button class="primary" id="send-text">发送文字<i data-icon="arrow"></i></button>
+    </div>
+  </section>
+  <div id="toast" role="status" hidden></div>
+</body>
+</html>
